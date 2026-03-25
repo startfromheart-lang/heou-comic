@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comic.mapper.ProjectMapper">
+    <resultMap id="BaseResultMap" type="com.heou.comic.entity.Project">
+        <id column="id" property="id"/>
+        <result column="project_name" property="projectName"/>
+        <result column="description" property="description"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="status" property="status"/>
+        <result column="current_step" property="currentStep"/>
+        <result column="total_steps" property="totalSteps"/>
+        <result column="auto_mode" property="autoMode"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM project WHERE deleted = 0
+        <if test="projectName != null and projectName != ''">
+            AND project_name LIKE '%' || #{projectName} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM project WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.heou.comic.entity.Project">
+        INSERT INTO project (project_name, description, cover_image, status, current_step, total_steps, auto_mode, create_user_id)
+        VALUES (#{projectName}, #{description}, #{coverImage}, #{status}, #{currentStep}, #{totalSteps}, #{autoMode}, #{createUserId})
+    </insert>
+
+    <update id="update" parameterType="com.heou.comic.entity.Project">
+        UPDATE project SET
+        project_name = #{projectName},
+        description = #{description},
+        cover_image = #{coverImage},
+        status = #{status},
+        current_step = #{currentStep},
+        total_steps = #{totalSteps},
+        auto_mode = #{autoMode},
+        update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE project SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM project WHERE deleted = 0
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM project WHERE status = #{status} AND deleted = 0
+    </select>
+
+    <select id="countByScriptId" resultType="int">
+        SELECT COUNT(*) FROM project_step_material WHERE material_type = 1 AND material_id = #{scriptId}
+    </select>
+
+    <select id="countByActorId" resultType="int">
+        SELECT COUNT(*) FROM project_step_material WHERE material_type = 2 AND material_id = #{actorId}
+    </select>
+
+    <select id="countBySceneId" resultType="int">
+        SELECT COUNT(*) FROM project_step_material WHERE material_type = 3 AND material_id = #{sceneId}
+    </select>
+</mapper>

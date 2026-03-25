@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comic.mapper.ActorMapper">
+    <resultMap id="BaseResultMap" type="com.heou.comic.entity.Actor">
+        <id column="id" property="id"/>
+        <result column="actor_name" property="actorName"/>
+        <result column="positioning" property="positioning"/>
+        <result column="personality" property="personality"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM actor WHERE deleted = 0
+        <if test="actorName != null and actorName != ''">
+            AND actor_name LIKE '%' || #{actorName} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM actor WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.heou.comic.entity.Actor">
+        INSERT INTO actor (actor_name, positioning, personality, image_url, description, status, create_user_id)
+        VALUES (#{actorName}, #{positioning}, #{personality}, #{imageUrl}, #{description}, #{status}, #{createUserId})
+    </insert>
+
+    <update id="update" parameterType="com.heou.comic.entity.Actor">
+        UPDATE actor SET
+        actor_name = #{actorName},
+        positioning = #{positioning},
+        personality = #{personality},
+        image_url = #{imageUrl},
+        description = #{description},
+        status = #{status},
+        update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE actor SET deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

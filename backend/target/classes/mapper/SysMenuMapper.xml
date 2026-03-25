@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comic.mapper.SysMenuMapper">
+    <resultMap id="BaseResultMap" type="com.heou.comic.entity.SysMenu">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="menu_name" property="menuName"/>
+        <result column="menu_code" property="menuCode"/>
+        <result column="path" property="path"/>
+        <result column="component" property="component"/>
+        <result column="icon" property="icon"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="menu_type" property="menuType"/>
+        <result column="visible" property="visible"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM sys_menu WHERE deleted = 0
+        <if test="menuName != null and menuName != ''">
+            AND menu_name LIKE '%' || #{menuName} || '%'
+        </if>
+        <if test="menuCode != null and menuCode != ''">
+            AND menu_code LIKE '%' || #{menuCode} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY sort_order ASC
+    </select>
+
+    <select id="selectByParentId" resultMap="BaseResultMap">
+        SELECT * FROM sys_menu WHERE parent_id = #{parentId} AND deleted = 0 ORDER BY sort_order ASC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM sys_menu WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.heou.comic.entity.SysMenu">
+        INSERT INTO sys_menu (parent_id, menu_name, menu_code, path, component, icon, sort_order, menu_type, visible, status)
+        VALUES (#{parentId}, #{menuName}, #{menuCode}, #{path}, #{component}, #{icon}, #{sortOrder}, #{menuType}, #{visible}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.heou.comic.entity.SysMenu">
+        UPDATE sys_menu SET
+        parent_id = #{parentId},
+        menu_name = #{menuName},
+        menu_code = #{menuCode},
+        path = #{path},
+        component = #{component},
+        icon = #{icon},
+        sort_order = #{sortOrder},
+        menu_type = #{menuType},
+        visible = #{visible},
+        status = #{status},
+        update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE sys_menu SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT DISTINCT m.* FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.id = rm.menu_id
+        LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+        WHERE ur.user_id = #{userId} AND m.deleted = 0 AND m.status = 1
+        ORDER BY m.sort_order ASC
+    </select>
+
+    <select id="countByParentId" resultType="int">
+        SELECT COUNT(*) FROM sys_menu WHERE parent_id = #{parentId} AND deleted = 0
+    </select>
+
+    <select id="countByRoleId" resultType="int">
+        SELECT COUNT(*) FROM sys_role_menu WHERE menu_id = #{menuId}
+    </select>
+</mapper>
