@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comicgenerator.mapper.ComicScriptMapper">
+
+    <resultMap type="ComicScript" id="ComicScriptResult">
+        <id     property="id"           column="id"           />
+        <result property="scriptName"   column="script_name"  />
+        <result property="content"      column="content"      />
+        <result property="status"       column="status"       />
+        <result property="creatorId"    column="creator_id"   />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateTime"   column="update_time"  />
+    </resultMap>
+
+    <sql id="selectScriptVo">
+        select id, script_name, content, status, creator_id, create_time, update_time from comic_script
+    </sql>
+
+    <select id="selectScriptList" parameterType="ComicScript" resultMap="ComicScriptResult">
+        <include refid="selectScriptVo"/>
+        <where>
+            <if test="scriptName != null and scriptName != ''">
+                AND script_name like concat('%', #{scriptName}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectScriptById" parameterType="Integer" resultMap="ComicScriptResult">
+        <include refid="selectScriptVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertScript" parameterType="ComicScript" useGeneratedKeys="true" keyProperty="id">
+        insert into comic_script(script_name, content, status, creator_id)
+        values(#{scriptName}, #{content}, #{status}, #{creatorId})
+    </insert>
+
+    <update id="updateScript" parameterType="ComicScript">
+        update comic_script
+        <set>
+            <if test="scriptName != null and scriptName != ''">script_name = #{scriptName},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteScriptById" parameterType="Integer">
+        delete from comic_script where id = #{id}
+    </delete>
+
+    <select id="countProjectByScriptId" parameterType="Integer" resultType="Integer">
+        select count(*) from comic_project where script_id = #{scriptId}
+    </select>
+</mapper>

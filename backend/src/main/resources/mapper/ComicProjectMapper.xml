@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comicgenerator.mapper.ComicProjectMapper">
+
+    <resultMap type="ComicProject" id="ComicProjectResult">
+        <id     property="id"           column="id"           />
+        <result property="projectName"  column="project_name" />
+        <result property="description"  column="description"  />
+        <result property="scriptId"     column="script_id"    />
+        <result property="status"       column="status"       />
+        <result property="creatorId"    column="creator_id"   />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateTime"   column="update_time"  />
+    </resultMap>
+
+    <sql id="selectProjectVo">
+        select id, project_name, description, script_id, status, creator_id, create_time, update_time from comic_project
+    </sql>
+
+    <select id="selectProjectList" parameterType="ComicProject" resultMap="ComicProjectResult">
+        <include refid="selectProjectVo"/>
+        <where>
+            <if test="projectName != null and projectName != ''">
+                AND project_name like concat('%', #{projectName}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectProjectById" parameterType="Integer" resultMap="ComicProjectResult">
+        <include refid="selectProjectVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertProject" parameterType="ComicProject" useGeneratedKeys="true" keyProperty="id">
+        insert into comic_project(project_name, description, script_id, status, creator_id)
+        values(#{projectName}, #{description}, #{scriptId}, #{status}, #{creatorId})
+    </insert>
+
+    <update id="updateProject" parameterType="ComicProject">
+        update comic_project
+        <set>
+            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="scriptId != null">script_id = #{scriptId},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProjectById" parameterType="Integer">
+        delete from comic_project where id = #{id}
+    </delete>
+
+    <select id="countProjectByScriptId" parameterType="Integer" resultType="Integer">
+        select count(*) from comic_project where script_id = #{scriptId}
+    </select>
+
+    <select id="countProjectByStatus" parameterType="Integer" resultType="Integer">
+        select count(*) from comic_project where status = #{status}
+    </select>
+</mapper>
