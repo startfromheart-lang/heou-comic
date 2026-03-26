@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comic.mapper.SysUserMapper">
+    <resultMap id="BaseResultMap" type="com.heou.comic.entity.SysUser">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar" property="avatar"/>
+        <result column="status" property="status"/>
+        <result column="is_admin" property="isAdmin"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM sys_user WHERE deleted = 0
+        <if test="username != null and username != ''">
+            AND username LIKE '%' || #{username} || '%'
+        </if>
+        <if test="nickname != null and nickname != ''">
+            AND nickname LIKE '%' || #{nickname} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM sys_user WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT * FROM sys_user WHERE username = #{username} AND deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.heou.comic.entity.SysUser">
+        INSERT INTO sys_user (username, password, nickname, email, phone, avatar, status, is_admin)
+        VALUES (#{username}, #{password}, #{nickname}, #{email}, #{phone}, #{avatar}, #{status}, #{isAdmin})
+    </insert>
+
+    <update id="update" parameterType="com.heou.comic.entity.SysUser">
+        UPDATE sys_user SET
+        username = #{username},
+        nickname = #{nickname},
+        email = #{email},
+        phone = #{phone},
+        avatar = #{avatar},
+        status = #{status},
+        update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE sys_user SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="countAdmin" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE is_admin = 1 AND deleted = 0
+    </select>
+
+    <select id="selectRoleIdsByUserId" resultType="long">
+        SELECT role_id FROM sys_user_role WHERE user_id = #{userId}
+    </select>
+
+    <select id="countByRoleId" resultType="int">
+        SELECT COUNT(*) FROM sys_user_role WHERE role_id = #{roleId}
+    </select>
+
+    <select id="countByMenuId" resultType="int">
+        SELECT COUNT(*) FROM sys_role_menu WHERE menu_id = #{menuId}
+    </select>
+</mapper>
