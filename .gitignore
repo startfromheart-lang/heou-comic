@@ -60,6 +60,6 @@ Thumbs.db
 # JAVA
 *.class
 target/
-data/
 node_modules/
-heou-comic.db
+.vite/
+*.db
