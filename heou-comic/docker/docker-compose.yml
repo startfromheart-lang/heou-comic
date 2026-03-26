@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-backend
+    container_name: heou-comic-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - heou-network
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-frontend
+    container_name: heou-comic-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - heou-network
+
+networks:
+  heou-network:
+    driver: bridge
+
+volumes:
+  data:
