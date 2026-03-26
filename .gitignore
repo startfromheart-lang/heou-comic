@@ -61,3 +61,5 @@ Thumbs.db
 *.class
 target/
 node_modules/
+.vite/
+*.db
