@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heou.comic.mapper.TaskMapper">
+    <resultMap id="BaseResultMap" type="com.heou.comic.entity.Task">
+        <id column="id" property="id"/>
+        <result column="task_name" property="taskName"/>
+        <result column="task_type" property="taskType"/>
+        <result column="project_id" property="projectId"/>
+        <result column="topic_id" property="topicId"/>
+        <result column="status" property="status"/>
+        <result column="progress" property="progress"/>
+        <result column="result" property="result"/>
+        <result column="error_msg" property="errorMsg"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM task WHERE deleted = 0
+        <if test="taskName != null and taskName != ''">
+            AND task_name LIKE '%' || #{taskName} || '%'
+        </if>
+        <if test="taskType != null">
+            AND task_type = #{taskType}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM task WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <insert id="insert" parameterType="com.heou.comic.entity.Task">
+        INSERT INTO task (task_name, task_type, project_id, topic_id, status, progress, result, error_msg, start_time, end_time, create_user_id)
+        VALUES (#{taskName}, #{taskType}, #{projectId}, #{topicId}, #{status}, #{progress}, #{result}, #{errorMsg}, #{startTime}, #{endTime}, #{createUserId})
+    </insert>
+
+    <update id="update" parameterType="com.heou.comic.entity.Task">
+        UPDATE task SET
+        task_name = #{taskName},
+        task_type = #{taskType},
+        project_id = #{projectId},
+        topic_id = #{topicId},
+        status = #{status},
+        progress = #{progress},
+        result = #{result},
+        error_msg = #{errorMsg},
+        start_time = #{startTime},
+        end_time = #{endTime},
+        update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE task SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="countRunning" resultType="int">
+        SELECT COUNT(*) FROM task WHERE status = 1 AND deleted = 0
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM task WHERE status = #{status} AND deleted = 0
+    </select>
+</mapper>
